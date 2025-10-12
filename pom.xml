@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.4</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.amolina</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>pizza-store-parent</artifactId>
+    <packaging>pom</packaging>
+    <name>Pizza Store Parent</name>
+    <description>Parent Pom for the pizza store project</description>
+
+    <modules>
+        <module>config-server</module>
+        <module>menu-service</module>
+        <module>order-service</module>
+        <module>customer-service</module>
+    </modules>
+
+    <properties>
+		<java.version>16</java.version>
+		<docker.image.prefix>amolina</docker.image.prefix>
+	</properties>
+
+    <dependencyManagement>
+		<dependencies>
+            <!-- Spring Cloud version 2020.0.4 needed for compatability with Spring Boot 2.5.4 -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>2020.0.4</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <image>
+                            <name>${docker.image.prefix}/${project.artifactId}:${project.version}</name>
+                        </image>
+                    </configuration>
+                </plugin>
+                <!-- Specify Lombok version to use for annotation processing -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>1.18.30</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
