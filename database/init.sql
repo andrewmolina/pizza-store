@@ -1,6 +1,6 @@
 -- Create Pizza table
 CREATE TABLE IF NOT EXISTS pizza (
-    item_id SERIAL PRIMARY KEY,
+    item_id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(255) NOT NULL,
     price NUMERIC(10, 2) NOT NULL
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS pizza (
 
 -- Create Customer table
 CREATE TABLE IF NOT EXISTS customer (
-    customer_id SERIAL PRIMARY KEY,
+    customer_id BIGSERIAL PRIMARY KEY,
     firstname VARCHAR(100) NOT NULL,
     lastname VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS customer (
 
 -- Create Order table (quoted because "order" is a reserved keyword in PostgreSQL)
 CREATE TABLE IF NOT EXISTS "order" (
-    order_id SERIAL PRIMARY KEY,
+    order_id BIGSERIAL PRIMARY KEY,
     item_id BIGINT NOT NULL,
     subtotal NUMERIC(10, 2) NOT NULL,
     tax NUMERIC(10, 2) NOT NULL,

@@ -58,18 +58,18 @@ services:
       config-server:
         condition: service_started
       
-  # customer-service:
-  #   build:
-  #     context: ./customer-service
-  #     args:
-  #       JAR_FILE: target/customer-service-0.0.1-SNAPSHOT.jar
-  #   image: amolina/customer-service:latest
-  #   environment:
-  #     SPRING_PROFILES_ACTIVE: dev
-  #   ports:
-  #     - "8083:8080"
-  #   depends_on:
-  #     database:
-  #       condition: service_healthy
-  #     config-server:
-  #       condition: service_started
+  customer-service:
+    build:
+      context: ./customer-service
+      args:
+        JAR_FILE: target/customer-service-0.0.1-SNAPSHOT.jar
+    image: amolina/customer-service:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8083:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+      config-server:
+        condition: service_started
