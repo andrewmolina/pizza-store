@@ -7,6 +7,14 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: pizzadb
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   config-server:
     build:
       context: ./config-server
@@ -15,18 +23,53 @@ services:
     image: amolina/config-server:latest
     ports:
       - "8071:8071"
-  # menu-service:
-  #   environment:
-  #     SPRING_PROFILES_ACTIVE: dev
-  #   ports:
-  #     - "8081:8080"
+    depends_on:
+      - database
+      
+  menu-service:
+    build:
+      context: ./menu-service
+      args:
+        JAR_FILE: target/menu-service-0.0.1-SNAPSHOT.jar
+    image: amolina/menu-service:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8081:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+      
   # order-service:
+  #   build:
+  #     context: ./order-service
+  #     args:
+  #       JAR_FILE: target/order-service-0.0.1-SNAPSHOT.jar
+  #   image: amolina/order-service:latest
   #   environment:
   #     SPRING_PROFILES_ACTIVE: dev
   #   ports:
   #     - "8082:8080"
+  #   depends_on:
+  #     database:
+  #       condition: service_healthy
+  #     config-server:
+  #       condition: service_started
+      
   # customer-service:
+  #   build:
+  #     context: ./customer-service
+  #     args:
+  #       JAR_FILE: target/customer-service-0.0.1-SNAPSHOT.jar
+  #   image: amolina/customer-service:latest
   #   environment:
   #     SPRING_PROFILES_ACTIVE: dev
   #   ports:
   #     - "8083:8080"
+  #   depends_on:
+  #     database:
+  #       condition: service_healthy
+  #     config-server:
+  #       condition: service_started

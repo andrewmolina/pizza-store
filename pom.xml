@@ -25,9 +25,9 @@
 
     <properties>
 		<java.version>11</java.version>
-		<docker.image.prefix>amolina</docker.image.prefix>
 	</properties>
 
+    <!-- Centralized dependency management -->
     <dependencyManagement>
 		<dependencies>
             <!-- Spring Cloud version 2020.0.4 needed for compatability with Spring Boot 2.5.4 -->
@@ -42,17 +42,9 @@
 	</dependencyManagement>
 
     <build>
+        <!-- Centralized build plugin management -->
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <configuration>
-                        <image>
-                            <name>${docker.image.prefix}/${project.artifactId}:${project.version}</name>
-                        </image>
-                    </configuration>
-                </plugin>
                 <!-- Specify Lombok version to use for annotation processing -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
