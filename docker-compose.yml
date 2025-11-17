@@ -25,7 +25,21 @@ services:
       - "8071:8071"
     depends_on:
       - database
-      
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      args:
+        JAR_FILE: target/eureka-server-0.0.1-SNAPSHOT.jar
+    image: amolina/eureka-server:latest
+    ports:
+      - "8072:8072"
+    depends_on:
+      database:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+
   menu-service:
     build:
       context: ./menu-service

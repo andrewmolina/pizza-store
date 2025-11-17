@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: eureka-server
+  boot:
+    admin:
+      context-path: /admin
+server:
+  port: 8072
+eureka:
+  instance:
+    hostname: eureka-server
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://localhost:8072/eureka/
+  server:
+    waitTimeInMsWhenSyncEmpty: 5
+    enableSelfPreservation: false  # Disable for development
+    evictionIntervalTimerInMs: 4000  # Cleanup interval for expired instances
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+   

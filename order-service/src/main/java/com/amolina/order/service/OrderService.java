@@ -1,7 +1,10 @@
 package com.amolina.order.service;
 
 import com.amolina.order.model.Order;
+import com.amolina.order.model.dto.OrderResponseDTO;
+import com.amolina.order.service.client.dto.PizzaDTO;
 import com.amolina.order.repository.OrderRepository;
+import com.amolina.order.service.client.MenuFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +17,37 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private MenuFeignClient menuFeignClient;
+
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
 
-    public Optional<Order> getOrderById(Long id) {
-        return orderRepository.findById(id);
+    public Optional<OrderResponseDTO> getOrderById(Long id) {
+        Optional<Order> orderOpt = orderRepository.findById(id);
+        
+        if (orderOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        
+        Order order = orderOpt.get();
+        
+        // Fetch pizza details from menu-service
+        PizzaDTO pizza = menuFeignClient.getPizza(order.getItemId().toString());
+        
+        // Build response with pizza details
+        OrderResponseDTO response = new OrderResponseDTO();
+        response.setOrderId(order.getOrderId());
+        response.setItemId(order.getItemId());
+        response.setPizzaName(pizza.getName());
+        response.setPizzaPrice(pizza.getPrice());
+        response.setSubtotal(order.getSubtotal());
+        response.setTax(order.getTax());
+        response.setTotal(order.getTotal());
+        response.setCustomerId(order.getCustomerId());
+        
+        return Optional.of(response);
     }
 
     public List<Order> getOrdersByCustomerId(Long customerId) {
