@@ -56,6 +56,22 @@ services:
       eureka-server:
         condition: service_started
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:15.0.2
+    restart: always
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      DB_VENDOR: h2
+      KEYCLOAK_IMPORT: /opt/jboss/keycloak/realm-export.json
+    volumes:
+        - ./keycloak/realm-export.json:/opt/jboss/keycloak/realm-export.json
+    command:
+      - "-Dkeycloak.profile.feature.scripts=enabled"
+      - "-Dkeycloak.profile.feature.upload_scripts=enabled"
+    ports:
+      - "8080:8080"
+
   menu-service:
     build:
       context: ./menu-service
