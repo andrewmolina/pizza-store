@@ -38,6 +38,7 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+            <!-- Exclude Ribbon for Eureka Server -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
@@ -53,6 +54,14 @@
                     </exclusion>
                 </exclusions>
 		    </dependency>
+            <!-- Keycloak BOM for security -->
+            <dependency>
+	            <groupId>org.keycloak.bom</groupId>
+	            <artifactId>keycloak-adapter-bom</artifactId>
+	            <version>11.0.2</version>
+	            <type>pom</type>
+	            <scope>import</scope>
+	        </dependency>
 		</dependencies>
 	</dependencyManagement>
 

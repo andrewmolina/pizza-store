@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @RestController
@@ -29,12 +30,14 @@ public class PizzaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @RolesAllowed("ADMIN")
     @PostMapping
     public ResponseEntity<Pizza> createPizza(@RequestBody Pizza pizza) {
         Pizza createdPizza = pizzaService.createPizza(pizza);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPizza);
     }
 
+    @RolesAllowed("ADMIN")
     @PutMapping("/{id}")
     public ResponseEntity<Pizza> updatePizza(@PathVariable Long id, @RequestBody Pizza pizza) {
         try {
@@ -45,6 +48,7 @@ public class PizzaController {
         }
     }
 
+    @RolesAllowed("ADMIN")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePizza(@PathVariable Long id) {
         try {
