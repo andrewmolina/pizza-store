@@ -18,5 +18,9 @@ public class OrderResponseDTO {
     private BigDecimal tax;
     private BigDecimal total;
     private Long customerId;
+    private String customerFirstname;
+    private String customerLastname;
+    private String customerEmail;
+    private String customerPhone;
 }
 
