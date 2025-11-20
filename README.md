@@ -4,15 +4,51 @@ A Spring Boot microservices application for managing a pizza store, featuring th
 
 ## Project Overview
 
-This project demonstrates a microservices architecture for a pizza store management system with the following components:
-
-- **Menu Service** (Port 8081): Manages pizza menu items
-- **Order Service** (Port 8082): Manages customer orders
-- **Customer Service** (Port 8083): Manages customer information
-- **Config Server** (Port 8071): Centralized configuration management
-- **PostgreSQL Database** (Port 5432): Shared database with separate tables per service
+This project demonstrates a microservices architecture for a pizza store management system with the following services:
+- **Menu Service**: Manages pizza menu items
+- **Order Service**: Manages customer orders and orchestrates service calls
+- **Customer Service**: Manages customer information
 
 ## Architecture
+
+### System Components
+
+- **API Gateway** (Port 8073): Entry point for all client requests, handles routing and token relay
+- **Eureka Server** (Port 8072): Service discovery and registration
+- **Keycloak** (Port 8080): Authentication and authorization server
+- **Config Server** (Port 8071): Centralized configuration management
+- **Menu Service**: Manages pizza menu items (only accessible via gateway)
+- **Order Service**: Manages customer orders and orchestrates calls to menu and customer services (only accessible via gateway)
+- **Customer Service**: Manages customer information (only accessible via gateway)
+- **PostgreSQL Database** (Port 5432): Shared database with separate tables per service
+
+### Request Flow
+
+The following diagram shows how a typical request flows through the system:
+
+```mermaid
+flowchart LR
+    Client([Client]) --> |1. Request + Token| Gateway[API Gateway]
+    Gateway --> |2. Service Discovery| Eureka[Eureka Server]
+    Eureka --> |3. Return Instance| Gateway
+    Gateway --> |4. Forward Request + Token| OrderService[Order Service]
+    OrderService --> |5. Verify Token| Keycloak[Keycloak]
+    OrderService --> |6. Get Pizza + Token| MenuService[Menu Service]
+    OrderService --> |7. Get Customer + Token| CustomerService[Customer Service]
+    MenuService --> |8. Verify Token| Keycloak
+    CustomerService --> |9. Verify Token| Keycloak
+    MenuService --> |10. Pizza Data| OrderService
+    CustomerService --> |11. Customer Data| OrderService
+    OrderService --> |12. Aggregated Response| Gateway
+    Gateway --> |13. Final Response| Client
+```
+
+**Key Features:**
+- **Centralized API Gateway**: Single entry point acting as a Policy Enforcement Point (PEP) for authentication, routing, and request filtering
+- **Service Discovery**: Eureka enables dynamic service location
+- **Auth Token Propagation**: Auth token flows through all services via `FeignClientInterceptor`
+- **Token Validation**: Each service independently validates tokens with Keycloak
+- **Resilience**: Circuit breakers, retries, and bulkheads protect inter-service calls
 
 ### Canonical Model
 
@@ -62,9 +98,16 @@ This expansion demonstrates how the microservices architecture supports growth w
 
 - Java 11
 - Spring Boot 2.5.4
-- Spring Cloud Config 2020.0.4
+- Spring Cloud 2020.0.4
+  - Spring Cloud Config
+  - Spring Cloud Gateway
+  - Spring Cloud Netflix Eureka
+  - Spring Cloud OpenFeign
+- Spring Security + Keycloak Adapter
+- Resilience4j (Circuit Breaker, Retry, Bulkhead, Time Limiter)
 - Spring Data JPA
 - PostgreSQL
+- Keycloak 15.0.2
 - Docker & Docker Compose
 - Lombok
 - Maven
@@ -81,11 +124,15 @@ This expansion demonstrates how the microservices architecture supports growth w
 ```
 pizza-store/
 ├── config-server/          # Centralized configuration service
+├── gateway-server/         # API Gateway service
+├── eureka-server/          # Service discovery server
 ├── menu-service/           # Menu/Pizza management microservice
 ├── order-service/          # Order management microservice
 ├── customer-service/       # Customer management microservice
 ├── database/               # SQL initialization scripts
+├── keycloak/               # Keycloak realm configuration
 ├── postman/                # Postman collection for API testing
+├── docs/                   # Documentation and architecture diagrams
 ├── docker-compose.yml      # Docker compose configuration
 └── pom.xml                 # Parent POM
 ```
@@ -125,7 +172,10 @@ docker-compose up --build
 
 This will:
 - Start PostgreSQL database and initialize tables with sample data
-- Start the Config Server
+- Start Keycloak authentication server with pre-configured realm
+- Start Eureka Server for service discovery
+- Start Config Server for centralized configuration
+- Start API Gateway for request routing
 - Start all three microservices (Menu, Order, Customer)
 
 2. **Stop all services:**
@@ -133,6 +183,66 @@ This will:
 ```bash
 docker-compose down
 ```
+
+3. **Stop and remove volumes (clears database and Keycloak data):**
+
+```bash
+docker-compose down -v
+```
+
+### Service Startup Order
+
+Services start in the following order with health checks:
+1. PostgreSQL Database
+2. Keycloak Authentication Server
+3. Config Server
+4. Eureka Server
+5. API Gateway
+6. Microservices (Menu, Order, Customer)
+
+## Authentication with Keycloak
+
+All API endpoints require a valid JWT token from Keycloak.
+
+### Keycloak Access
+
+- **URL**: http://localhost:8080/auth
+- **Admin Console**: http://localhost:8080/auth/admin
+- **Admin Credentials**: admin / admin
+- **Realm**: pizza-store
+- **Client**: pizza-store-client
+
+### Getting an Access Token
+
+Use the Client Credentials grant flow to obtain a token:
+
+```bash
+curl -X POST 'http://localhost:8080/auth/realms/pizza-store/protocol/openid-connect/token' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=client_credentials' \
+  -d 'client_id=pizza-store-client' \
+  -d 'client_secret=4b1b5a01-9627-47cc-91fe-74bf42cc35c6'
+```
+
+Response:
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI...",
+  "expires_in": 300,
+  "token_type": "Bearer"
+}
+```
+
+### Making Authenticated Requests
+
+All requests must include the Bearer token in the Authorization header:
+
+```bash
+curl -X GET 'http://localhost:8073/order-service/api/orders/1' \
+  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+**Note**: All requests should go through the API Gateway (port 8073), not directly to microservices.
 
 ## Configuration Profiles
 
@@ -163,35 +273,46 @@ environment:
 
 ## API Endpoints
 
-### Menu Service (localhost:8081)
+**Important**: All requests must include a valid JWT Bearer token in the `Authorization` header and should be routed through the API Gateway at `http://localhost:8073`.
 
-- `GET /api/pizzas` - Get all pizzas
-- `GET /api/pizzas/{id}` - Get pizza by ID
-- `POST /api/pizzas` - Create new pizza
-- `PUT /api/pizzas/{id}` - Update pizza
-- `DELETE /api/pizzas/{id}` - Delete pizza
+### API Gateway Routes
 
-### Order Service (localhost:8082)
+The gateway automatically routes requests based on the service name prefix:
 
-- `GET /api/orders` - Get all orders
-- `GET /api/orders/{id}` - Get order by ID
-- `GET /api/orders/customer/{customerId}` - Get orders by customer
-- `POST /api/orders` - Create new order
-- `PUT /api/orders/{id}` - Update order
-- `DELETE /api/orders/{id}` - Delete order
+- **Menu Service**: `http://localhost:8073/menu-service/*`
+- **Order Service**: `http://localhost:8073/order-service/*`
+- **Customer Service**: `http://localhost:8073/customer-service/*`
 
-### Customer Service (localhost:8083)
+### Menu Service
 
-- `GET /api/customers` - Get all customers
-- `GET /api/customers/{id}` - Get customer by ID
-- `GET /api/customers/email/{email}` - Get customer by email
-- `POST /api/customers` - Create new customer
-- `PUT /api/customers/{id}` - Update customer
-- `DELETE /api/customers/{id}` - Delete customer
+- `GET /menu-service/api/pizzas` - Get all pizzas
+- `GET /menu-service/api/pizzas/{id}` - Get pizza by ID
+- `POST /menu-service/api/pizzas` - Create new pizza
+- `PUT /menu-service/api/pizzas/{id}` - Update pizza
+- `DELETE /menu-service/api/pizzas/{id}` - Delete pizza
 
-### Config Server (localhost:8071)
+### Order Service
 
-- `GET /{service-name}/{profile}` - Get configuration for a service
+- `GET /order-service/api/orders` - Get all orders
+- `GET /order-service/api/orders/{id}` - Get order by ID (includes pizza and customer details)
+- `GET /order-service/api/orders/customer/{customerId}` - Get orders by customer
+- `POST /order-service/api/orders` - Create new order
+- `PUT /order-service/api/orders/{id}` - Update order
+- `DELETE /order-service/api/orders/{id}` - Delete order
+
+### Customer Service
+
+- `GET /customer-service/api/customers` - Get all customers
+- `GET /customer-service/api/customers/{id}` - Get customer by ID
+- `GET /customer-service/api/customers/email/{email}` - Get customer by email
+- `POST /customer-service/api/customers` - Create new customer
+- `PUT /customer-service/api/customers/{id}` - Update customer
+- `DELETE /customer-service/api/customers/{id}` - Delete customer
+
+### Admin Endpoints (No Authentication Required)
+
+- **Eureka Dashboard**: `http://localhost:8072` - View registered services
+- **Config Server**: `http://localhost:8071/{service-name}/{profile}` - View service configuration
   - Example: `http://localhost:8071/menu-service/dev`
 
 ## Database Schema
@@ -240,10 +361,58 @@ The database is initialized with sample data:
 - **5 Customers**: John Doe, Jane Smith, Mike Johnson, Sarah Williams, David Brown
 - **5 Orders**: Sample orders linking customers to pizzas
 
+## Resilience Patterns
+
+The application implements several resilience patterns using Resilience4j to protect inter-service communication:
+
+### Circuit Breaker
+
+Prevents cascading failures by opening the circuit when a service is down:
+
+- **Failure Rate Threshold**: 50% (circuit opens after 50% of calls fail)
+- **Wait Duration in Open State**: 10 seconds
+- **Sliding Window**: 5 calls to calculate failure rate
+- **Minimum Calls**: 3 calls before circuit breaker activates
+
+### Retry
+
+Automatically retries failed calls:
+
+- **Max Attempts**: 3 attempts per call
+- **Wait Duration**: 2 seconds between retries
+- **Exponential Backoff**: Enabled
+
+### Bulkhead
+
+Limits concurrent calls to prevent resource exhaustion:
+
+- **Max Concurrent Calls**: 10 per service
+- **Max Wait Duration**: 0ms (fail immediately if bulkhead is full)
+
+### Time Limiter
+
+Prevents slow calls from blocking threads:
+
+- **Timeout Duration**: 5 seconds
+- **Cancel Running Future**: true (cancels the call if timeout is reached)
+
+### Fallback Methods
+
+When a service is unavailable, fallback methods provide default responses:
+
+- **Menu Service**: Returns "Pizza (Details Unavailable)" with zero price
+- **Customer Service**: Returns "Customer (Details Unavailable)" with empty contact info
+
+**Example**: When fetching order details, if the menu-service is down, the order service will still return the order with default pizza information.
+
 ## Development Notes
-- Each microservice is a minimal CRUD service primarily meant for demonstration purpose — responsibilites can be expanded as microservices evolve
+- Each microservice is a minimal CRUD service primarily meant for demonstration purpose — responsibilities can be expanded as microservices evolve
 - Each microservice has its own 3-layer architecture: Controller → Service → Repository
+- Service Discovery: Services register with Eureka and discover each other dynamically
+- Inter-Service Communication: Uses Feign clients with automatic JWT token propagation via `FeignClientInterceptor`
+- Separation of Concerns: External service calls are isolated in dedicated client services (`MenuServiceClient`, `CustomerServiceClient`) to enable proper AOP interception of Resilience4j annotations
 - JPA/Hibernate with `validate` mode (expects tables to exist)
 - RESTful endpoints follow standard conventions
 - Proper HTTP status codes (200 OK, 201 Created, 204 No Content, 404 Not Found)
+- Comprehensive logging for debugging resilience patterns and authentication flows
 
