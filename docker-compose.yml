@@ -64,11 +64,13 @@ services:
       KEYCLOAK_PASSWORD: admin
       DB_VENDOR: h2
       KEYCLOAK_IMPORT: /opt/jboss/keycloak/realm-export.json
+      KEYCLOAK_FRONTEND_URL: http://keycloak:8080/auth
     volumes:
         - ./keycloak/realm-export.json:/opt/jboss/keycloak/realm-export.json
     command:
       - "-Dkeycloak.profile.feature.scripts=enabled"
       - "-Dkeycloak.profile.feature.upload_scripts=enabled"
+      - "-Dkeycloak.frontend.url=http://keycloak:8080/auth"
     ports:
       - "8080:8080"
 

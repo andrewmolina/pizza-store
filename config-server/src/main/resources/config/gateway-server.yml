@@ -8,6 +8,9 @@ spring:
       discovery.locator:
         enabled: true
         lowerCaseServiceId: true
+      default-filters:
+        - RemoveRequestHeader=Cookie,Set-Cookie
+        
 
 eureka:
   instance:
