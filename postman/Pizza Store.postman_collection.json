@@ -8,6 +8,238 @@
 	},
 	"item": [
 		{
+			"name": "Keycloak",
+			"item": [
+				{
+					"name": "get token",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "4b1b5a01-9627-47cc-91fe-74bf42cc35c6",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "pizza-store-client",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "andrew.molina",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://keycloak:8080/auth/realms/pizza-store/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"keycloak"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"realms",
+								"pizza-store",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Config Server",
+			"item": [
+				{
+					"name": "get eureka-server config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8071/eureka-server/default",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8071",
+							"path": [
+								"eureka-server",
+								"default"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get gateway-server config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8071/gateway-server/default",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8071",
+							"path": [
+								"gateway-server",
+								"default"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get menu-service config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8071/menu-service/:profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8071",
+							"path": [
+								"menu-service",
+								":profile"
+							],
+							"variable": [
+								{
+									"key": "profile",
+									"value": "prod"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get order-service config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8071/order-service/:profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8071",
+							"path": [
+								"order-service",
+								":profile"
+							],
+							"variable": [
+								{
+									"key": "profile",
+									"value": "dev"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get customer-service config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8071/customer-service/:profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8071",
+							"path": [
+								"customer-service",
+								":profile"
+							],
+							"variable": [
+								{
+									"key": "profile",
+									"value": "dev"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8071/actuator/env",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8071",
+							"path": [
+								"actuator",
+								"env"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Eureka Server",
+			"item": [
+				{
+					"name": "get registered apps",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8072/eureka/apps",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8072",
+							"path": [
+								"eureka",
+								"apps"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Menu Service",
 			"item": [
 				{
@@ -16,13 +248,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8081/api/pizzas",
+							"raw": "http://localhost:8073/menu-service/api/pizzas",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8081",
+							"port": "8073",
 							"path": [
+								"menu-service",
 								"api",
 								"pizzas"
 							]
@@ -36,13 +269,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8081/api/pizzas/:id",
+							"raw": "http://localhost:8073/menu-service/api/pizzas/:id",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8081",
+							"port": "8073",
 							"path": [
+								"menu-service",
 								"api",
 								"pizzas",
 								":id"
@@ -72,13 +306,14 @@
 							"raw": "{\n  \"name\": \"Classic Cheese\",\n  \"description\": \"Just cheese\",\n  \"price\": 9.99\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8081/api/pizzas",
+							"raw": "http://localhost:8073/menu-service/api/pizzas",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8081",
+							"port": "8073",
 							"path": [
+								"menu-service",
 								"api",
 								"pizzas"
 							]
@@ -101,13 +336,14 @@
 							"raw": "{\n  \"name\": \"Margherita Supreme\",\n  \"description\": \"Fresh mozzarella, tomato sauce, basil, and extra virgin olive oil\",\n  \"price\": 13.99\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8081/api/pizzas/:id",
+							"raw": "http://localhost:8073/menu-service/api/pizzas/:id",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8081",
+							"port": "8073",
 							"path": [
+								"menu-service",
 								"api",
 								"pizzas",
 								":id"
@@ -128,14 +364,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8081/api/pizzas/:id",
+							"raw": "http://localhost:8073/menu-service/pizzas/:id",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8081",
+							"port": "8073",
 							"path": [
-								"api",
+								"menu-service",
 								"pizzas",
 								":id"
 							],
@@ -160,13 +396,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8082/api/orders",
+							"raw": "http://localhost:8073/order-service/api/orders",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8082",
+							"port": "8073",
 							"path": [
+								"order-service",
 								"api",
 								"orders"
 							]
@@ -180,13 +417,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8082/api/orders/:id",
+							"raw": "http://localhost:8073/order-service/api/orders/:id",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8082",
+							"port": "8073",
 							"path": [
+								"order-service",
 								"api",
 								"orders",
 								":id"
@@ -194,7 +432,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "1"
+									"value": "2"
 								}
 							]
 						}
@@ -207,13 +445,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8082/api/orders/customer/:customerId",
+							"raw": "http://localhost:8073/order-service/api/orders/customer/:customerId",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8082",
+							"port": "8073",
 							"path": [
+								"order-service",
 								"api",
 								"orders",
 								"customer",
@@ -244,13 +483,14 @@
 							"raw": "{\n  \"itemId\": 4,\n  \"subtotal\": 16.99,\n  \"tax\": 1.36,\n  \"total\": 18.35,\n  \"customerId\": 2\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8082/api/orders",
+							"raw": "http://localhost:8073/order-service/api/orders",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8082",
+							"port": "8073",
 							"path": [
+								"order-service",
 								"api",
 								"orders"
 							]
@@ -273,13 +513,14 @@
 							"raw": "{\n  \"itemId\": 5,\n  \"subtotal\": 15.49,\n  \"tax\": 1.24,\n  \"total\": 16.73,\n  \"customerId\": 1\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8082/api/orders/:id",
+							"raw": "http://localhost:8073/order-service/api/orders/:id",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8082",
+							"port": "8073",
 							"path": [
+								"order-service",
 								"api",
 								"orders",
 								":id"
@@ -300,13 +541,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8082/api/orders/:id",
+							"raw": "http://localhost:8073/order-service/api/orders/:id",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8082",
+							"port": "8073",
 							"path": [
+								"order-service",
 								"api",
 								"orders",
 								":id"
@@ -332,13 +574,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8083/api/customers",
+							"raw": "http://localhost:8073/customer-service/api/customers",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8083",
+							"port": "8073",
 							"path": [
+								"customer-service",
 								"api",
 								"customers"
 							]
@@ -352,13 +595,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8083/api/customers/:id",
+							"raw": "http://localhost:8073/customer-service/api/customers/:id",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8083",
+							"port": "8073",
 							"path": [
+								"customer-service",
 								"api",
 								"customers",
 								":id"
@@ -379,13 +623,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8083/api/customers/email/:email",
+							"raw": "http://localhost:8073/customer-service/api/customers/email/:email",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8083",
+							"port": "8073",
 							"path": [
+								"customer-service",
 								"api",
 								"customers",
 								"email",
@@ -416,13 +661,14 @@
 							"raw": "{\n  \"firstname\": \"Emily\",\n  \"lastname\": \"Davis\",\n  \"phone\": \"555-0106\",\n  \"email\": \"emily.davis@email.com\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8083/api/customers",
+							"raw": "http://localhost:8073/customer-service/api/customers",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8083",
+							"port": "8073",
 							"path": [
+								"customer-service",
 								"api",
 								"customers"
 							]
@@ -445,13 +691,14 @@
 							"raw": "{\n  \"firstname\": \"John\",\n  \"lastname\": \"Doe\",\n  \"phone\": \"555-0199\",\n  \"email\": \"john.doe.updated@email.com\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8083/api/customers/:id",
+							"raw": "http://localhost:8073/customer-service/api/customers/:id",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8083",
+							"port": "8073",
 							"path": [
+								"customer-service",
 								"api",
 								"customers",
 								":id"
@@ -472,13 +719,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8083/api/customers/:id",
+							"raw": "http://localhost:8073/customer-service/api/customers/:id",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8083",
+							"port": "8073",
 							"path": [
+								"customer-service",
 								"api",
 								"customers",
 								":id"
@@ -494,57 +742,40 @@
 					"response": []
 				}
 			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuaElnMXA2dVB2NGV1dE00MG8zSU55NDV5NEs5NEs1NXJ2VDRBejVNSEZBIn0.eyJleHAiOjE3NjM2MTIwNDYsImlhdCI6MTc2MzYxMTc0NiwianRpIjoiMDBiMjYzZjctM2ZlZi00ODM3LTg5OTAtMWEwM2FlNTIyYTM3IiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvcGl6emEtc3RvcmUiLCJzdWIiOiJjN2FmOTVjYy1jZTkxLTRkMjgtYTM2ZS1lODZlZDQ4MzI4YjMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwaXp6YS1zdG9yZS1jbGllbnQiLCJzZXNzaW9uX3N0YXRlIjoiZTRhMzgwMjMtMGQ5MC00MzM4LWFhZmYtY2Q4YzI4ODE1Mjk5IiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJwaXp6YS1zdG9yZS1hZG1pbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7InBpenphLXN0b3JlLWNsaWVudCI6eyJyb2xlcyI6WyJBRE1JTiJdfX0sInNjb3BlIjoiZW1haWwgcHJvZmlsZSIsInNpZCI6ImU0YTM4MDIzLTBkOTAtNDMzOC1hYWZmLWNkOGMyODgxNTI5OSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwibmFtZSI6IkFuZHJldyBNb2xpbmEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhbmRyZXcubW9saW5hIiwiZ2l2ZW5fbmFtZSI6IkFuZHJldyIsImZhbWlseV9uYW1lIjoiTW9saW5hIiwiZW1haWwiOiJhbmRyZXdfbW9saW5hMUBiYXlsb3IuZWR1In0.R1e2U9OKzmXclx7qKBQ9Wv_l4lfpu6MZKQR0z3xyTk2uWdPScBBhprjm7KiCm0dGMszUMDyk6e7bx_RxK_hS4EPeLM8Z-10uWQTxm3iMLnHRWI4ic7BX3HZW37drR2FwVrk1u3hHkwIaF28aG79l71AdbavfwKBTxDpWM3qllqHhVVcyE82Mdu9ih5QWGJnSIKqMpzPyRb9nC3N9wKIusFTcNfT1UbKBEap8XG2rBPhmxOHDjnXaWYp_LlEjva_L1DuTiS_Vn0fRfqGYqzmRghVCXh1kkLGTYtp2jDHyJ6OsLkubsQ8nFeoeZDgWxmGG6R3s-91cokLURml2sa2Ucw",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
 		},
 		{
-			"name": "Config Server",
-			"item": [
-				{
-					"name": "get menu-service config",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8071/menu-service/:profile",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8071",
-							"path": [
-								"menu-service",
-								":profile"
-							],
-							"variable": [
-								{
-									"key": "profile",
-									"value": "prod"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "actuator",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8071/actuator/env",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8071",
-							"path": [
-								"actuator",
-								"env"
-							]
-						}
-					},
-					"response": []
-				}
-			]
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
